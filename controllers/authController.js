@@ -8,7 +8,17 @@ const {
 
 exports.register = async (req, res, next) => {
     try {
-        const { username, email, password } = req.body;
+        const {
+            firstName,
+            lastName,
+            phone,
+            address,
+            age,
+            dateOfBirth,
+            username,
+            email,
+            password,
+        } = req.body;
 
         const checkUserAlreadyExist = await User.findOne({
             username: username,
@@ -17,7 +27,17 @@ exports.register = async (req, res, next) => {
         if (checkUserAlreadyExist) {
             return res.status(400).json({ message: 'User already exists' });
         }
-        const user = await User.create({ username, email, password });
+        const user = await User.create({
+            firstName,
+            lastName,
+            phone,
+            address,
+            age,
+            dateOfBirth,
+            username,
+            email,
+            password,
+        });
         const { accessToken, refreshToken } = await generateTokens(user._id);
         res.status(201).json({
             user: { id: user._id, username, email },

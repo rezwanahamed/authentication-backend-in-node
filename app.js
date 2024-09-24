@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
+const connectDB = require('./config/database');
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 
 // Database connection
+// connectDB();
 mongoose
     .connect(process.env.MONGODB_URI, {
         useNewUrlParser: true,
