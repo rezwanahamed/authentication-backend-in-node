@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Token = require('../models/Token');
+const Otp = require('../models/Otp');
 const {
     generateTokens,
     verifyToken,
@@ -49,11 +50,36 @@ exports.register = async (req, res, next) => {
     }
 };
 
+exports.registerOtpVerification = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const user = await User.findOne({ email });
+        if (!user || user.otp !== otp) {
+            return res.status(401).json({ message: 'Invalid OTP' });
+        }
+        user.verified = true;
+        await user.save();
+
+        const { accessToken, refreshToken } = await generateTokens(user._id);
+        res.json({
+            user: { id: user._id, username: user.username, email },
+            accessToken,
+            refreshToken,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        if (!user || !(await user.comparePassword(password))) {
+        if (
+            !user ||
+            !(await user.comparePassword(password)) ||
+            user.verified != true
+        ) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         const { accessToken, refreshToken } = await generateTokens(user._id);

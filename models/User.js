@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
         address: { type: String, required: true },
         dateOfBirth: { type: Date, required: true },
         password: { type: String, required: true },
+        verified: { type: Boolean, default: false },
     },
     { timestamps: true }
 );
