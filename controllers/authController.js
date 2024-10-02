@@ -1,11 +1,12 @@
 const User = require('../models/User');
 const Token = require('../models/Token');
-const Otp = require('../models/Otp');
 const {
     generateTokens,
     verifyToken,
     blacklistToken,
 } = require('../utils/tokenUtils');
+const { generateOtp, verifyOtp } = require('../utils/otpUtils');
+const { verifyPasskey } = require('../utils/passKeyultis');
 
 exports.register = async (req, res, next) => {
     try {
@@ -39,11 +40,10 @@ exports.register = async (req, res, next) => {
             email,
             password,
         });
-        const { accessToken, refreshToken } = await generateTokens(user._id);
+
+        await generateOtp(user.email, email);
         res.status(201).json({
-            user: { id: user._id, username, email },
-            accessToken,
-            refreshToken,
+            message: 'otp generated',
         });
     } catch (error) {
         next(error);
@@ -54,9 +54,16 @@ exports.registerOtpVerification = async (req, res) => {
     try {
         const { email, otp } = req.body;
         const user = await User.findOne({ email });
-        if (!user || user.otp !== otp) {
-            return res.status(401).json({ message: 'Invalid OTP' });
+        if (!user) {
+            return res.status(401).json({ message: 'User not found' });
         }
+
+        const verified = verifyOtp(email, otp);
+
+        if (!verified) {
+            return res.status(401).json({ message: 'Invalid otp' });
+        }
+
         user.verified = true;
         await user.save();
 
@@ -82,16 +89,73 @@ exports.login = async (req, res, next) => {
         ) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
-        const { accessToken, refreshToken } = await generateTokens(user._id);
-        res.json({
-            user: { id: user._id, username: user.username, email },
-            accessToken,
-            refreshToken,
-        });
+
+        const isUserVerified = await User.verified;
+        if (!isUserVerified) {
+            return res.status(403).json({ message: 'User is not verified' });
+        }
     } catch (error) {
         next(error);
     }
 };
+
+exports.generateLoginOtp = async (req, res, next) => {
+    try {
+        const { credential, credentialType } = req.body;
+        if (credentialType === 'email') {
+            generateEmailLoginOtp(credential);
+        } else if (credentialType === 'phone') {
+            generateSmsLoginOtp(credential, credential);
+        } else {
+            return res.status(400).json({ message: 'Invalid credential type' });
+        }
+    } catch (e) {
+        next(e);
+    }
+};
+
+exports.verifyLoginOtp = async (req, res, next) => {
+    try {
+        const { otp, credential, email } = req.body;
+        const isOtpVerified = await verifyOtp(otp, credential);
+        if (!isOtpVerified) {
+            return res.status(400).json({ message: 'Invalid credential type' });
+        }
+
+        const user = await User.findOne({ email: email });
+        const { accessToken, refreshToken } = await generateTokens(user._id);
+        return res.status(200).json({
+            user: { id: user._id, username: user.username, email },
+            accessToken,
+            refreshToken,
+            message: 'Login successful',
+        });
+    } catch (e) {
+        next(e);
+    }
+};
+
+exports.verifyLoginViaPassCode = async (req, res, next) => {
+    try {
+        const { passKey, email } = req.body;
+        const isPasskeyValid = await verifyPasskey(email, passKey);
+        if (!isPasskeyValid) {
+            return res.status(400).json({ message: 'Invalid credential type' });
+        }
+
+        const user = await User.findOne({ email: email });
+        const { accessToken, refreshToken } = await generateTokens(user._id);
+        return res.status(200).json({
+            user: { id: user._id, username: user.username, email },
+            accessToken,
+            refreshToken,
+            message: 'Login successful',
+        });
+    } catch (e) {
+        next(e);
+    }
+};
+
 
 exports.refreshToken = async (req, res, next) => {
     try {

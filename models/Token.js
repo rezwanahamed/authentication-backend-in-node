@@ -11,5 +11,4 @@ tokenSchema.index({ token: 1, type: 1 });
 tokenSchema.index({ userId: 1, type: 1 });
 
 const Token = mongoose.model('Token', tokenSchema);
-
 module.exports = Token;

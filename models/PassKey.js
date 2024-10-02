@@ -1,19 +1,9 @@
-const generatePasskey = (length = 10) => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
-    let passkey = '';
-    
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        passkey += characters[randomIndex];
-    }
-    
-    return passkey;
-};
+const mongoose = require('mongoose');
 
-// Generate and display example passkeys
-const examplePasskeys = [];
-for (let i = 0; i < 5; i++) {
-    examplePasskeys.push(generatePasskey());
-}
+const passkeySchema = new mongoose.Schema({
+    email: {type: String, required: true },
+    passkey: { type: String, required: true },
+});
 
-console.log(examplePasskeys);
+const Passkey = mongoose.model('Passkey', passkeySchema);
+module.exports = Passkey;

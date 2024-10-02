@@ -1,6 +1,6 @@
 const Otp = require('../models/Otp');
 
-const generateOtp = async ({ credential, credentialType }) => {
+const generateOtp = async (credential, credentialType) => {
     const otp = Math.floor(100000 + Math.random() * 900000);
     const currentTime = new Date();
     const expiresAt = new Date(currentTime.getTime() + 5 * 60 * 1000);
@@ -39,4 +39,4 @@ const verifyOtp = async (otp, credential) => {
     return true;
 };
 
-module.exports = { generateOtp, verifyOtp};
+module.exports = { generateOtp, verifyOtp };
