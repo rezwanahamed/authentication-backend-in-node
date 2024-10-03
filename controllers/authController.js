@@ -23,12 +23,21 @@ exports.register = async (req, res, next) => {
         } = req.body;
 
         const checkUserAlreadyExist = await User.findOne({
-            username: username,
             email: email,
         });
         if (checkUserAlreadyExist) {
             return res.status(400).json({ message: 'User already exists' });
         }
+
+        const checkPhoneNumberIsUnique = await User.findOne({
+            phone: phone,
+        });
+        if (checkPhoneNumberIsUnique) {
+            return res
+                .status(401)
+                .json({ message: 'Phone number already exist' });
+        }
+
         const user = await User.create({
             firstName,
             lastName,
@@ -155,7 +164,6 @@ exports.verifyLoginViaPassCode = async (req, res, next) => {
         next(e);
     }
 };
-
 
 exports.refreshToken = async (req, res, next) => {
     try {
