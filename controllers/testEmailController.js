@@ -7,7 +7,7 @@ exports.testEmailSender = async (req, res, next) => {
         const { data, error } = await resend.emails.send({
             from: 'Acme <onboarding@resend.dev>',
             to: ['deadpoolzrx@gmail.com'],
-            subject: 'Hello World 21',
+            subject: 'Hello World',
             html: '<strong>It works!</strong>',
         });
 
