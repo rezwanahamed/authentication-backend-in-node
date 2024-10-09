@@ -17,7 +17,6 @@ exports.register = async (req, res, next) => {
             address,
             age,
             dateOfBirth,
-            username,
             email,
             password,
         } = req.body;
@@ -45,12 +44,11 @@ exports.register = async (req, res, next) => {
             address,
             age,
             dateOfBirth,
-            username,
             email,
             password,
         });
 
-        await generateOtp(user.email, email);
+        await generateOtp(user.email, "email");
         res.status(201).json({
             message: 'otp generated',
         });
@@ -64,7 +62,7 @@ exports.registerOtpVerification = async (req, res) => {
         const { email, otp } = req.body;
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'User not found' });
+            return res.status(400).json({ message: 'User not found' });
         }
 
         const verified = verifyOtp(email, otp);
@@ -78,7 +76,7 @@ exports.registerOtpVerification = async (req, res) => {
 
         const { accessToken, refreshToken } = await generateTokens(user._id);
         res.json({
-            user: { id: user._id, username: user.username, email },
+            user: { id: user._id, email: user.email },
             accessToken,
             refreshToken,
         });
@@ -134,7 +132,7 @@ exports.verifyLoginOtp = async (req, res, next) => {
         const user = await User.findOne({ email: email });
         const { accessToken, refreshToken } = await generateTokens(user._id);
         return res.status(200).json({
-            user: { id: user._id, username: user.username, email },
+            user: { id: user._id, email: user.email },
             accessToken,
             refreshToken,
             message: 'Login successful',
@@ -155,7 +153,7 @@ exports.verifyLoginViaPassCode = async (req, res, next) => {
         const user = await User.findOne({ email: email });
         const { accessToken, refreshToken } = await generateTokens(user._id);
         return res.status(200).json({
-            user: { id: user._id, username: user.username, email },
+            user: { id: user._id, email: user.email },
             accessToken,
             refreshToken,
             message: 'Login successful',
