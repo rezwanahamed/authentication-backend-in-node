@@ -48,7 +48,7 @@ exports.register = async (req, res, next) => {
             password,
         });
 
-        await generateOtp(user.email, "email");
+        await generateOtp(user.email, 'email');
         res.status(201).json({
             message: 'otp generated',
         });
@@ -57,16 +57,16 @@ exports.register = async (req, res, next) => {
     }
 };
 
-exports.registerOtpVerification = async (req, res) => {
+exports.registerOtpVerification = async (req, res, next) => {
     try {
         const { email, otp } = req.body;
         const user = await User.findOne({ email });
+
         if (!user) {
             return res.status(400).json({ message: 'User not found' });
         }
 
-        const verified = verifyOtp(email, otp);
-
+        const verified = await verifyOtp(email, otp);
         if (!verified) {
             return res.status(401).json({ message: 'Invalid otp' });
         }
@@ -89,18 +89,17 @@ exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        if (
-            !user ||
-            !(await user.comparePassword(password)) ||
-            user.verified != true
-        ) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+
+        if (!user || !(await user.comparePassword(password))) {
+            return res.status(401).json({ message: 'User already exists' });
         }
 
-        const isUserVerified = await User.verified;
+        const isUserVerified = await user.verified;
         if (!isUserVerified) {
             return res.status(403).json({ message: 'User is not verified' });
         }
+
+        return res.status(200).json({ message: 'Otp generated' });
     } catch (error) {
         next(error);
     }

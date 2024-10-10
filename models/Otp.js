@@ -4,7 +4,7 @@ const otpSchema = new mongoose.Schema(
         otp: {
             type: Number,
             required: true,
-        },
+          },
         credentialType: {
             type: String,
             enum: ['phone', 'email'],

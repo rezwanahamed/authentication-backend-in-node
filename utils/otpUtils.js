@@ -23,20 +23,31 @@ const generateOtp = async (credential, credentialType) => {
     return otp;
 };
 
-const verifyOtp = async (otp, credential) => {
-    const currentTime = new Date();
-    const otpObj = Otp.findOne({ otp: otp, credential: credential });
-
-    if (!otpObj) {
-        throw new Error('Invalid OTP');
+const verifyOtp = async (email, otp) => {
+    try {
+      const otpRecord = await Otp.findOne({
+        credential: email,
+        credentialType: 'email',
+        otp: otp
+      });
+  
+      if (!otpRecord) {
+        return false;
+      }
+  
+      // Check if OTP is expired
+      if (otpRecord.expiresAt < new Date()) {
+        await Otp.deleteOne({ _id: otpRecord._id });
+        return false;
+      }
+  
+      // OTP is valid, delete it from the database
+      await Otp.deleteOne({ _id: otpRecord._id });
+      return true;
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      return false;
     }
-
-    if (currentTime > otpObj.expiresAt) {
-        throw new Error('OTP expired');
-    }
-
-    await otpObj.delete(); // Delete the OTP once it's been verified
-    return true;
-};
+  };
 
 module.exports = { generateOtp, verifyOtp };
