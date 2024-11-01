@@ -1,4 +1,5 @@
 const Otp = require('../models/Otp');
+const { sendSimpleEmail } = require('../config/emailService');
 
 const generateOtp = async (credential, credentialType) => {
     const otp = Math.floor(100000 + Math.random() * 900000);

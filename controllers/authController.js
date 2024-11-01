@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Token = require('../models/Token');
+const { sendSimpleEmail } = require('../config/emailService');
 const {
     generateTokens,
     verifyToken,
@@ -47,8 +48,12 @@ exports.register = async (req, res, next) => {
             email,
             password,
         });
-
-        await generateOtp(user.email, 'email');
+        const otp = await generateOtp(user.email, 'email');
+        sendSimpleEmail(
+            user.email,
+            'Test Subject',
+            `<p>Your email verification OTP is ${otp}</p>`
+        );
         res.status(201).json({
             message: 'otp generated',
         });
@@ -75,7 +80,7 @@ exports.registerOtpVerification = async (req, res, next) => {
         await user.save();
 
         const { accessToken, refreshToken } = await generateTokens(user._id);
-        res.json({
+        return res.status(200).json({
             user: { id: user._id, email: user.email },
             accessToken,
             refreshToken,

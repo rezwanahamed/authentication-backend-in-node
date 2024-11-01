@@ -13,6 +13,6 @@ router.post(
     authController.registerOtpVerification
 );
 router.post('/logout', auth, authController.logout);
-router.post('/send-email', emailController.testEmailSender)
+router.post('/send-email', emailController.otpEmail)
 
 module.exports = router;
