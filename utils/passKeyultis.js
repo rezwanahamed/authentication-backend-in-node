@@ -14,16 +14,29 @@ const generatePasskey = (length = 10) => {
 };
 
 const saveGeneratedPasskey = async (email) => {
-    const existingPasskey = await Passkey.findOne({ email: email });
-    if (existingPasskey) {
-        await existingPasskey.deleteMany({ email: email });
-    }
+    try {
+        // Delete all existing passkeys for this email
+        await Passkey.deleteMany({ email: email });
 
-    for (let i = 0; i < 5; i++) {
-        const passkey = generatePasskey();
-        const newPasskey = Passkey({ email: email, passkey: passkey });
-        await newPasskey.save();
+        // Generate and save 5 new passkeys
+        const passkeys = [];
+        for (let i = 0; i < 5; i++) {
+            const passkey = generatePasskey();
+            const newPasskey = new Passkey({ email: email, passkey: passkey });
+            await newPasskey.save();
+            passkeys.push(passkey);
+        }
+
+        return passkeys;
+    } catch (error) {
+        console.error('Error in saveGeneratedPasskey:', error);
+        throw error;
     }
+};
+
+const getGeneratedPasskeys = async (email) => {
+    const passkeys = await Passkey.find({ email });
+    return passkeys;
 };
 
 const verifyPasskey = async (email, passkey) => {
@@ -42,4 +55,4 @@ const verifyPasskey = async (email, passkey) => {
     }
 };
 
-module.exports = { saveGeneratedPasskey, verifyPasskey };
+module.exports = { saveGeneratedPasskey, verifyPasskey, getGeneratedPasskeys };
