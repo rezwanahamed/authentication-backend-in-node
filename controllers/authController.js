@@ -7,7 +7,12 @@ const {
     blacklistToken,
 } = require('../utils/tokenUtils');
 const { generateOtp, verifyOtp } = require('../utils/otpUtils');
-const { verifyPasskey, saveGeneratedPasskey, getGeneratedPasskeys } = require('../utils/passKeyultis');
+const {
+    verifyPasskey,
+    saveGeneratedPasskey,
+    getGeneratedPasskeys,
+} = require('../utils/passKeyultis');
+const { getWelcomeEmailTemplate } = require('../templates/welcomeEmailTemplate');
 
 exports.register = async (req, res, next) => {
     try {
@@ -205,9 +210,24 @@ exports.registerOtpVerification = async (req, res, next) => {
         await user.save();
 
         const { accessToken, refreshToken } = await generateTokens(user._id);
-        saveGeneratedPasskey(email)
-        const userAllPasskeys = await getGeneratedPasskeys(email)
-        console.log("===============", userAllPasskeys)
+        await saveGeneratedPasskey(email);
+        const userAllPasskeys = await getGeneratedPasskeys(email);
+
+        if (!userAllPasskeys || !Array.isArray(userAllPasskeys)) {
+            throw new Error('Failed to generate passkeys');
+        }
+
+        // Generate passkey HTML list
+        const passkeysHtml = userAllPasskeys
+            .map(pk => `<div style="font-size: 18px; letter-spacing: 1px; color: #2c3e50; font-weight: bold; margin: 5px 0; text-align: center;">${pk.passkey}</div>`)
+            .join('');
+
+        const emailTemplate = getWelcomeEmailTemplate(passkeysHtml);
+        await sendSimpleEmail(
+            email,
+            'Congratulations for creating your account',
+            emailTemplate
+        );
 
         return res.status(200).json({
             user: { id: user._id, email: user.email },
@@ -215,6 +235,7 @@ exports.registerOtpVerification = async (req, res, next) => {
             refreshToken,
         });
     } catch (error) {
+        console.error('OTP verification error:', error);
         next(error);
     }
 };
