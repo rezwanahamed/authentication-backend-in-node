@@ -268,10 +268,13 @@ exports.login = async (req, res, next) => {
 exports.generateLoginOtp = async (req, res, next) => {
     try {
         const { credential, credentialType } = req.body;
+        console.log(credential);
         if (credentialType === 'email') {
+            console.log('email token is running');
             try {
                 const otp = await generateOtp(credential, 'email');
-                sendSimpleEmail(
+                console.log('otp is:', otp);
+                await sendSimpleEmail(
                     credential,
                     'Login OTP ',
                     `<!DOCTYPE html>
@@ -371,8 +374,8 @@ exports.verifyLoginOtp = async (req, res, next) => {
 
 exports.verifyLoginViaPassCode = async (req, res, next) => {
     try {
-        const { passKey, email } = req.body;
-        const isPasskeyValid = await verifyPasskey(email, passKey);
+        const { passkey, email } = req.body;
+        const isPasskeyValid = await verifyPasskey(email, passkey);
         if (!isPasskeyValid) {
             return res.status(400).json({ message: 'Invalid credential type' });
         }

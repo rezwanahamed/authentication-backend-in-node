@@ -2,7 +2,7 @@ const Passkey = require('../models/PassKey');
 
 const generatePasskey = (length = 10) => {
     const characters =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$#%';
     let passkey = '';
 
     for (let i = 0; i < length; i++) {

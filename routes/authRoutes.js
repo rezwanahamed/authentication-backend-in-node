@@ -13,6 +13,7 @@ router.post(
 );
 router.post('/login', authController.login);
 router.post('/generate-login-otp', authController.generateLoginOtp)
+router.post('/login-via-passkey', authController.verifyLoginViaPassCode)
 router.post('/generate-passkey', saveGeneratedPasskey )
 router.post('/logout', auth, authController.logout);
 router.post('/refresh-token', authController.refreshToken);
