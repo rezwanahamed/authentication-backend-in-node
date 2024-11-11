@@ -124,7 +124,7 @@ exports.register = async (req, res, next) => {
 // generate new otp
 exports.generateNewOtp = async (req, res) => {
     try {
-        // console.log(req.body.email)
+        console.log(req.body.email)
         const otp = await generateOtp(req.body.email, 'email');
         sendSimpleEmail(
             req.body.email,
@@ -268,7 +268,7 @@ exports.login = async (req, res, next) => {
 exports.generateLoginOtp = async (req, res, next) => {
     try {
         const { credential, credentialType } = req.body;
-        console.log(credential);
+        console.log(    );
         if (credentialType === 'email') {
             console.log('email token is running');
             try {
@@ -353,8 +353,9 @@ exports.generateLoginOtp = async (req, res, next) => {
 
 exports.verifyLoginOtp = async (req, res, next) => {
     try {
-        const { otp, credential, email } = req.body;
-        const isOtpVerified = await verifyOtp(otp, credential);
+        const { otp, email } = req.body;
+        console.log(email, otp)
+        const isOtpVerified = await verifyOtp(email, otp);
         if (!isOtpVerified) {
             return res.status(400).json({ message: 'Invalid credential type' });
         }
