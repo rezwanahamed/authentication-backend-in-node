@@ -33,7 +33,6 @@ const generateOtp = async (credential, credentialType) => {
             throw new Error('Failed to create OTP record');
         }
 
-        console.log(`OTP generated for ${credentialType}: ${credential}`);
         return otp;
     } catch (error) {
         console.error('Error generating OTP:', error);
