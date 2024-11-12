@@ -35,7 +35,7 @@ const saveGeneratedPasskey = async (email) => {
 };
 
 const getGeneratedPasskeys = async (email) => {
-    const passkeys = await Passkey.find({ email });
+    const passkeys = await Passkey.find({ email }).select("passkey");
     return passkeys;
 };
 

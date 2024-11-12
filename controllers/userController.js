@@ -1,5 +1,6 @@
 const Passkey = require('../models/PassKey');
 const User = require('../models/User');
+const { getGeneratedPasskeys } = require('../utils/passKeyultis');
 
 exports.userData = async (req, res) => {
     try {
@@ -35,7 +36,7 @@ exports.userPassKeys = async (req, res) => {
         }
         
         // Fetch passkeys associated with the user's email
-        const userPasskeys = await Passkey.find({ email: user.email }).select("passkey");
+        const userPasskeys = await getGeneratedPasskeys(user?.email)
 
         // Return structured response with user and their passkeys (empty array if none found)
         res.status(200).json({
