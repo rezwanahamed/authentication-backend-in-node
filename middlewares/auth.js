@@ -9,6 +9,7 @@ const auth = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
+    console.log("=================== Token:",token);
     const decoded = verifyToken(token, process.env.JWT_ACCESS_SECRET);
     if (!decoded) {
       return res.status(401).json({ message: 'Invalid token' });
