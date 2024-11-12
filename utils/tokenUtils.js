@@ -27,8 +27,9 @@ const verifyToken = (token, secret) => {
     }
 };
 
-const blacklistToken = async (token) => {
+const blacklistToken = async (token, id) => {
     await Token.create({
+        userId: id,
         token,
         type: 'blacklisted',
         expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes

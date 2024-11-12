@@ -392,30 +392,38 @@ exports.verifyLoginViaPassCode = async (req, res, next) => {
 };
 
 exports.refreshToken = async (req, res, next) => {
+    console.log('Refresh token api called ');
     try {
         const { refreshToken } = req.body;
         const decoded = verifyToken(
             refreshToken,
             process.env.JWT_REFRESH_SECRET
         );
+        console.log('token decode pass1 ');
         if (!decoded) {
             return res.status(401).json({ message: 'Invalid refresh token' });
         }
         const token = await Token.findOne({
-            userId: decoded.userId,
             token: refreshToken,
             type: 'refresh',
         });
+        console.log('token found pass2');
         if (!token) {
             return res.status(401).json({ message: 'Refresh token not found' });
         }
+        const user = token.userId;
+        console.log('user id: ', user);
+        console.log('user found pass3');
+
         await Token.deleteOne({ _id: token._id });
+        console.log('token deleted pass 4');
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-            await generateTokens(decoded.userId);
+            await generateTokens(user);
         res.json({
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
         });
+        console.log('all test code passed successfully');
     } catch (error) {
         next(error);
     }
@@ -423,9 +431,11 @@ exports.refreshToken = async (req, res, next) => {
 
 exports.logout = async (req, res, next) => {
     try {
-        const { refreshToken } = req.body;
+        const { refreshToken, accessToken } = req.body;
+        const userId = req.user?.userId;
+
         await Token.deleteOne({ token: refreshToken, type: 'refresh' });
-        await blacklistToken(req.headers.authorization.split(' ')[1]);
+        await blacklistToken(accessToken, userId);
         res.json({ message: 'Logged out successfully' });
     } catch (error) {
         next(error);
