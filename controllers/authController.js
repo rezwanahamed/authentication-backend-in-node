@@ -423,7 +423,7 @@ exports.refreshToken = async (req, res, next) => {
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
         });
-        console.log('all test code passed successfully');
+        console.log('all test code passed successfully 😊💡❤️');
     } catch (error) {
         next(error);
     }
