@@ -1,4 +1,4 @@
-exports.otpEmailTemplate = (otp) => {
+exports.otpEmailTemplate = (otp, firstName="There") => {
     return `<!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +15,7 @@ exports.otpEmailTemplate = (otp) => {
                 
                 <div style="margin: 20px 0;">
                     <h2 style="color: #3d3d3d; font-size: 24px; margin-bottom: 15px;">Your One-Time Password (OTP)</h2>
-                    <p style="font-weight: 500; color: #3d3d3d; font-size: 16px; margin: 10px 0;">Hello ${firstName},</p>
+                    <p style="font-weight: 500; color: #3d3d3d; font-size: 16px; margin: 10px 0;">Hi ${firstName},</p>
                     <p style="font-weight: 500; color: #3d3d3d; font-size: 16px; margin: 10px 0;">You have requested a one-time password for account verification. Please use the code below to complete your authentication.</p>
                 </div>
 
