@@ -23,6 +23,9 @@ const verifyToken = (token, secret) => {
     try {
         return jwt.verify(token, secret);
     } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            return { expired: true };
+        }
         return null;
     }
 };
