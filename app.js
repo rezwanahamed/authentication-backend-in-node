@@ -10,15 +10,9 @@ const app = express();
 
 // CORS Configuration
 const corsOptions = {
-    origin: [
-        'http://localhost:3000',
-        'https://authentication-frontend-nu.vercel.app',
-        process.env.FRONTEND_URL,
-    ].filter(Boolean),
+    origin: '*', // Allow all origins
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-    optionsSuccessStatus: 200,
 };
 
 // Middleware
